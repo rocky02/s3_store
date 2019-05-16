@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+system("ruby", "bin/app.rb", ARGV[0], ARGV[1], ARGV[2])
