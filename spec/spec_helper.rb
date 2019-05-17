@@ -16,7 +16,7 @@
 require 'simplecov'
 SimpleCov.start
 require_relative '../config/s3_store'
-require File.join(QIt.root, 'application_config')
+require File.join(S3Store.root, 'application_config')
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

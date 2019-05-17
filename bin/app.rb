@@ -1,5 +1,4 @@
 require_relative '../application_config'
-require 'byebug'
 class App
   include AwsLoader
 
