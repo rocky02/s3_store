@@ -2,7 +2,7 @@ require 'yaml'
 require_relative '../config/s3_store'
 module AwsLoader
   
-  AWS_PATH = File.join(QIt.root, 'config/aws.yml')
+  AWS_PATH = File.join(S3Store.root, 'config/aws.yml')
   AWS = YAML.load(File.read(AWS_PATH))["aws"] if File.exists?(AWS_PATH)
   def generate_aws_yml_file
     sample_aws = {"aws"=>{"access_key_id"=>"", "secret_access_key"=>"", "region"=>""}}
