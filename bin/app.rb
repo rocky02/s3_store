@@ -6,16 +6,15 @@ class App
 
   def execute_operation(options)
     operation = options.delete_at(0)
-
+    s3_bucket = S3Bucket.create_bucket(options[0])
+    
     case operation
     when 'create'
       # S3Bucket.validate(options[0])
-      publisher = S3Bucket.new(options[0])
-      publisher.create_bucket
+      s3_bucket.create_bucket
     when 'delete'
       # S3Bucket.validate(options)
-      subscriber = S3Bucket.new(options[0])
-      subscriber.delete_bucket
+      s3_bucket.delete_bucket
     when 'list'
       S3Bucket.list_buckets
     else
