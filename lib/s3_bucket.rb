@@ -1,3 +1,5 @@
+require 'byebug'
+
 class S3Bucket
 
   attr_reader :bucket_name
@@ -15,24 +17,22 @@ class S3Bucket
   def create_bucket
     raise S3StoreArgumentError, "S3StoreArgumentError :: Invalid bucket name.".colorize(:red) if bucket_name.nil?
     begin
-      response = S3Bucket.client.create_bucket({bucket: bucket_name})
+      response = @@client.create_bucket({bucket: bucket_name})
       puts "S3 Bucket #{bucket_name} created successfully!".colorize(:green) unless response.nil?
     rescue Aws::S3::Errors::InvalidBucketName => e
-      puts "S3StoreArgumentError :: InvalidBucketName :: Bucket name #{bucket_name} is invalid".colorize(:red)
+      raise S3StoreArgumentError, "S3StoreArgumentError :: InvalidBucketName :: Bucket name #{bucket_name} is invalid".colorize(:red)
     rescue Aws::S3::Errors::BucketAlreadyOwnedByYou => e
-      puts "S3StoreArgumentError :: BucketAlreadyOwnedByYou :: Bucket with name #{bucket_name} already exists in your S3 account.".colorize(:red)
+      raise S3StoreArgumentError, "S3StoreArgumentError :: BucketAlreadyOwnedByYou :: Bucket with name #{bucket_name} already exists in your S3 account.".colorize(:red)
     end
   end
 
   def self.list_buckets
     response = @@client.list_buckets
-    if response.buckets.empty? || response.nil?
-      puts "You don't seem to have any buckets in your linked AWS S3 account.".colorize(:light_blue)
-      puts "You may create one by using the command :: ".colorize(:light_blue) + " bin/s3_store_server create <bucket-name>".colorize(:yellow).bold 
-    else
+    raise S3StoreEmptyBucketError, 
+          "S3StoreEmptyBucketError :: You don't seem to have any buckets in your linked AWS S3 account. You may create one by using the command :: ".colorize(:light_blue) + " bin/s3_store_server create <bucket-name>".colorize(:yellow).bold if empty_store?(response)
+
       bucket_names = response.buckets.map(&:name)
       bucket_names.each { |name| puts name.colorize(:yellow) }
-    end
   end
 
   def delete_bucket
@@ -43,6 +43,10 @@ class S3Bucket
     rescue Aws::S3::Errors::NoSuchBucket => e
       puts "Aws::S3::Errors::NoSuchBucket :: #{bucket_name} does not exist!".colorize(:red)
     end
+  end
+
+  def empty_store?(response)
+    response.buckets.empty? || response.nil?
   end
 
 end
