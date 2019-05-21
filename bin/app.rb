@@ -1,4 +1,4 @@
-require_relative '../application_config'
+require_relative '../boot'
 class App
   include AwsLoader
 
@@ -6,17 +6,19 @@ class App
 
   def execute_operation(options)
     operation = options.delete_at(0)
-    s3_bucket = S3Bucket.create_bucket(options[0])
+    bucket_name = options[0]
     
     case operation
     when 'create'
-      # S3Bucket.validate(options[0])
-      s3_bucket.create_bucket
+      # Store.validate(options[0])
+      store = Store.new
+      store.create_bucket(bucket_name)
     when 'delete'
-      # S3Bucket.validate(options)
+      s3_bucket = Bucket.new(bucket_name)
       s3_bucket.delete_bucket
     when 'list'
-      S3Bucket.list_buckets
+      store = Store.new
+      store.list_buckets
     else
       raise S3StoreNoServiceError, "Invalid operation name. Try #{OPERATIONS.join(', ')}.".colorize(:red) if (operation.nil? || !OPERATIONS.include?(operation.downcase))
     end  

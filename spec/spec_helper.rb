@@ -15,8 +15,8 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'simplecov'
 SimpleCov.start
-require_relative '../config/s3_store'
-require File.join(S3Store.root, 'application_config')
+require_relative '../lib/store'
+require File.join(Store.root, 'boot')
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

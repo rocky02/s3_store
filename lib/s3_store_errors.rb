@@ -11,3 +11,5 @@ class S3StoreInvalidArgumentError < S3StoreArgumentError; end
 class S3StoreNoServiceError < S3StoreStandardError; end
 
 class S3StoreEmptyBucketError < S3StoreStandardError; end
+
+class S3StoreEmptyError < S3StoreStandardError; end
