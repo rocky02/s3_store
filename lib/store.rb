@@ -1,3 +1,4 @@
+require 'byebug'
 class Store
 
   attr_reader :client
@@ -35,6 +36,6 @@ class Store
   end
 
   def empty_store?(response)
-    response.buckets.empty? || response.nil?
+    response.nil? || response.buckets.empty?
   end
 end

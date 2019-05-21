@@ -11,35 +11,39 @@ RSpec.describe Store do
     
     it 'should list all the buckets in the linked account when response is not empty/nil' do
       s3.stub_responses(:list_buckets, buckets: [{ name: 'bucket1' }, { name: 'bucket2' }, { name: 'bucket3' }])
-      allow(s3).to receive(:list_buckets)
-      allow(s3_store).to receive(:list_buckets)
       response = s3.list_buckets
       expect(s3_store).to receive(:list_buckets).and_return(response)
       s3_store.list_buckets
     end
     
-    # it 'display message when there are no buckets - empty / nil response' do
-    #   s3.stub_responses(:list_buckets, buckets: [])
-    #   allow(s3).to receive(:list_buckets)
-    #   allow(Store).to receive(:list_buckets)
-      # response = s3.list_buckets
-      # puts "response ============= #{response}"
-      # allow(Store).to receive(:empty_store?)#.and_return(true)
-      # expect(Store).to receive(:list_buckets).and_return(response)
-      # expect { Store.list_buckets }.to raise_error(S3StoreEmptyError)
-    # end
+    it 'display message when there are no buckets - empty / nil response' do
+      s3.stub_responses(:list_buckets, buckets: [])
+      expect { s3_store.list_buckets }.to raise_error(S3StoreEmptyError)
+    end
   end
 
   context '#create_bucket' do
-    it 'should create a new bucket with bucket name' do
-      bucket_name = "foobar007"
+    
+    let (:bucket_name) { "foobar007" }
+    let (:invalid_bucket_name) { "TestBucket!" }
+    
+    before do
       s3.stub_responses(:create_bucket)
-      allow(s3).to receive(:create_bucket)
-      allow(s3_store).to receive(:create_bucket)#.with(bucket_name)
-      response = s3.create_bucket(bucket: bucket_name)
-      # expect(STDOUT).to receive(:puts).with("S3 Bucket #{bucket_name} created successfully!")
+    end
+
+    it 'should create a new bucket with bucket name' do
       expect(s3_store).to receive(:create_bucket).with(bucket_name)
       s3_store.create_bucket(bucket_name)
+    end
+
+    it 'should rescue Aws::S3::Errors::InvalidBucketName' do
+      s3_store.stub(:create_bucket).and_raise('Aws::S3::Errors::InvalidBucketName')
+      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::InvalidBucketName')
+    end
+
+    it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do
+      s3_store.stub(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
     end
   end
 end
