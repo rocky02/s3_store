@@ -1,7 +1,11 @@
 require 'yaml'
 module AwsLoader
   
-  AWS_PATH = File.join(Dir.pwd, 'config/aws.yml')
+  AWS_PATH = if File.directory?(Application.root + '/config')
+               File.join(Application.root, 'config/aws.yml') 
+             else
+               FileUtils.mkdir_p(Application.root + '/config')[0]
+             end
   AWS = YAML.load(File.read(AWS_PATH))["aws"] if File.exists?(AWS_PATH)
 
   def generate_aws_yml_file
