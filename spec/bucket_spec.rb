@@ -29,4 +29,19 @@ RSpec.describe Bucket do
       expect { bucket.delete_bucket }.to raise_error('Aws::S3::Errors::PermanentRedirect')
     end
   end
+
+  context '#valid?(bucket_name)' do
+    
+    let(:valid_bucket_names) { ['test01', 'test-01', 'test.01'] }
+    let(:invalid_bucket_names) { ['test_01', 'Test-01', '255.23.45.01', 'test@01'] }
+    
+    it 'should validate the name of the bucket against regex' do
+      valid_bucket_names.each do |bucket_name|
+        expect(Bucket.valid? bucket_name).to be_truthy
+      end
+      invalid_bucket_names.each do |bucket_name|
+        expect(Bucket.valid? bucket_name).to be_falsey
+      end
+    end
+  end
 end

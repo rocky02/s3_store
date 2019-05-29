@@ -10,9 +10,12 @@ class App
     
     case operation
     when 'create'
-      # Store.validate(options[0])
-      store = Store.new
-      store.create_bucket(bucket_name)
+      if Bucket.valid?(bucket_name)
+        store = Store.new
+        store.create_bucket(bucket_name)
+      else
+        raise Aws::S3::Errors::InvalidBucketName, "Aws::S3::Errors::InvalidBucketName :: Invalid bucket name".colorize(:red)
+      end
     when 'delete'
       s3_bucket = Bucket.new(bucket_name)
       s3_bucket.delete_bucket

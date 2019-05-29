@@ -7,6 +7,11 @@ class Bucket
     @bucket_name = name
   end
 
+  def self.valid?(bucket_name)
+    regex = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/
+    bucket_name.match?(regex)    
+  end
+
   def delete_bucket
     begin
       raise S3StoreArgumentError, 'S3StoreArgumentError :: Incorrect argument. bucket_name is mandatory!'.colorize(:red) if bucket_name.nil? || bucket_name.empty?

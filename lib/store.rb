@@ -7,12 +7,6 @@ class Store
     creds = Aws::Credentials.new(AwsLoader::AWS["access_key_id"], AwsLoader::AWS["secret_access_key"])
     @client = Aws::S3::Client.new(region: AwsLoader::AWS["region"], credentials: creds)
   end
-    
-  @@root ||= Dir.pwd
-  
-  def self.root
-    @@root
-  end
   
   def create_bucket(bucket_name)
     raise S3StoreArgumentError, "S3StoreArgumentError :: Invalid bucket name.".colorize(:red) if bucket_name.nil?
