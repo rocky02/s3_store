@@ -14,7 +14,7 @@ class App
         store = Store.new
         store.create_bucket(bucket_name)
       else
-        raise Aws::S3::Errors::InvalidBucketName, "Aws::S3::Errors::InvalidBucketName :: Invalid bucket name".colorize(:red)
+        raise S3StoreInvalidArgumentError, "S3StoreInvalidArgumentError:: Invalid bucket name".colorize(:red)
       end
     when 'delete'
       s3_bucket = Bucket.new(bucket_name)
