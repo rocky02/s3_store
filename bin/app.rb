@@ -30,8 +30,8 @@ end
 
 # Beginning of execution of App.
 options = ARGV
-operation = options[0]
 raise S3StoreArgumentError, "Wrong Arguments. Check documentation on how to run the operation.".colorize(:red) if options.length < 1
+operation = options[0]
 
 begin
   app = App.new
