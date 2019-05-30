@@ -19,8 +19,6 @@ class Bucket
       puts "Bucket #{bucket_name} deleted successfully!".colorize(:green) unless response.nil?
     rescue Aws::S3::Errors::NoSuchBucket => e
       puts "Aws::S3::Errors::NoSuchBucket :: #{bucket_name} does not exist!".colorize(:red)
-    rescue Aws::S3::Errors::PermanentRedirect => e
-      puts "Aws::S3::Errors::PermanentRedirect :: #{bucket_name} does not exist for your account!".colorize(:red)
     end
   end
 end
