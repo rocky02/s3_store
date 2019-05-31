@@ -11,7 +11,7 @@ RSpec.describe Bucket do
     
     it 'should delete the bucket from the s3 store' do
       expect(bucket).to receive(:delete_bucket)
-      bucket.delete_bucket
+      expect { bucket.delete_bucket }.to_not raise_error('Aws::S3::Errors::NoSuchBucket')
     end
 
     it 'should raise S3StoreArgumentError when bucket name is not provided' do
