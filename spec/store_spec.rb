@@ -40,8 +40,7 @@ RSpec.describe Store do
     end
 
     it 'should rescue Aws::S3::Errors::InvalidBucketName' do
-      s3_store.stub(:create_bucket).and_raise('Aws::S3::Errors::InvalidBucketName')
-      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::InvalidBucketName')
+      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error(S3StoreArgumentError)
     end
 
     it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do

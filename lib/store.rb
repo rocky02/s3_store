@@ -8,7 +8,7 @@ class Store
   end
   
   def create_bucket(bucket_name)
-    raise S3StoreArgumentError, "S3StoreArgumentError :: Invalid bucket name.".colorize(:red) if bucket_name.nil?
+    raise S3StoreArgumentError, "S3StoreArgumentError :: Invalid bucket name.".colorize(:red) unless Bucket.valid?(bucket_name)
     begin
       response = aws_client.create_bucket({bucket: bucket_name})
       puts "S3 Bucket #{bucket_name} created successfully!".colorize(:green) unless response.nil?
