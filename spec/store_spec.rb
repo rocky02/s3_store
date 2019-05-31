@@ -26,6 +26,7 @@ RSpec.describe Store do
     
     let (:bucket_name) { "foobar007" }
     let (:invalid_bucket_name) { "TestBucket!" }
+    let (:response) { double('response') }
     
     before do
       s3.stub_responses(:create_bucket)
@@ -33,6 +34,8 @@ RSpec.describe Store do
 
     it 'should create a new bucket with bucket name' do
       expect(s3_store).to receive(:create_bucket).with(bucket_name)
+      expect(s3).to receive(:create_bucket).with({bucket: bucket_name}).and_return(response)
+      s3.create_bucket({bucket: bucket_name})
       s3_store.create_bucket(bucket_name)
     end
 
@@ -48,7 +51,7 @@ RSpec.describe Store do
   end
 
   context '#no_bucket?(response)' do
-    let(:response) { double('response') }
+    let (:response) { double('response') }
 
     context 'when response is nil' do
       it 'should be true' do
