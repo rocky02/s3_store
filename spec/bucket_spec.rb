@@ -19,14 +19,9 @@ RSpec.describe Bucket do
       expect { invalid_bucket.delete_bucket }.to raise_error(S3StoreArgumentError)
     end
 
-    it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do
+    it 'should rescue Aws::S3::Errors::NoSuchBucket' do
       bucket.stub(:delete_bucket).and_raise('Aws::S3::Errors::NoSuchBucket')
       expect { bucket.delete_bucket }.to raise_error('Aws::S3::Errors::NoSuchBucket')
-    end
-
-    it 'should rescue Aws::S3::Errors::PermanentRedirect' do
-      bucket.stub(:delete_bucket).and_raise('Aws::S3::Errors::PermanentRedirect')
-      expect { bucket.delete_bucket }.to raise_error('Aws::S3::Errors::PermanentRedirect')
     end
   end
 

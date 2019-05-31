@@ -1,4 +1,5 @@
 require 'aws-sdk-s3'
+require 'logger'
 require 'colorize'
 require 'byebug'
 require_relative 'application'
