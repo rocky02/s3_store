@@ -46,4 +46,29 @@ RSpec.describe Store do
       expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
     end
   end
+
+  context '#no_bucket?(response)' do
+    let(:response) { double('response') }
+
+    context 'when response is nil' do
+      it 'should be true' do
+        allow(response).to receive(:nil?).and_return(true)
+        expect(s3_store.no_buckets?(response)).to be_truthy
+      end
+    end
+
+    context 'when response.buckets is empty' do
+      it 'should be true' do
+        allow(response).to receive(:buckets).and_return([])
+        expect(s3_store.no_buckets?(response)).to be_truthy
+      end
+    end
+
+    context 'when there are buckets in the s3 store' do
+      it 'should be false' do
+        allow(response).to receive(:buckets).and_return(['bucket-1', 'bucket-2'])
+        expect(s3_store.no_buckets?(response)).to be_falsey
+      end
+    end
+  end
 end
