@@ -3,7 +3,7 @@ class Bucket
   attr_reader :bucket_name, :client
   
   def initialize(name)
-    @client = Store.new.client
+    @client = Application.new.client
     @bucket_name = name
   end
 

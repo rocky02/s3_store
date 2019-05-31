@@ -4,7 +4,7 @@ RSpec.describe Store do
   let (:s3_store) { Store.new }
   
   before do
-    allow(s3_store).to receive(:client).and_return(s3)
+    allow(s3_store).to receive(:aws_client).and_return(s3)
   end
   
   context '#list_buckets' do
