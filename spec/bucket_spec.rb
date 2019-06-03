@@ -20,7 +20,7 @@ RSpec.describe Bucket do
     end
 
     it 'should rescue Aws::S3::Errors::NoSuchBucket' do
-      bucket.stub(:delete_bucket).and_raise('Aws::S3::Errors::NoSuchBucket')
+      allow(bucket).to receive(:delete_bucket).and_raise('Aws::S3::Errors::NoSuchBucket')
       expect { bucket.delete_bucket }.to raise_error('Aws::S3::Errors::NoSuchBucket')
     end
   end
