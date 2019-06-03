@@ -4,8 +4,9 @@ module AwsLoader
   AWS = YAML.load(File.read(Application.aws_config_file_path))['aws'] if File.exists?(Application.aws_config_file_path)
 
   def config_folder_check
-    unless File.directory?(Application.root + '/config')
-      FileUtils.mkdir_p(Application.root + '/config')[0]
+    path = Application.root + '/config'
+    unless File.directory?(path)
+      FileUtils.mkdir_p(path)[0]
     end
   end
 
@@ -13,7 +14,7 @@ module AwsLoader
     if File.exists?(Application.aws_config_file_path)
       file_content = YAML.load(File.read(Application.aws_config_file_path))
       if !file_content || file_content.values.any?(&:empty?)
-        puts "Fill in the appropriate values for the aws.yml file".colorize(:light_red)
+        puts 'Fill in the appropriate values for the aws.yml file'.colorize(:light_red)
         exit(1)
       end
     else
