@@ -32,7 +32,8 @@ RSpec.describe Store do
     end
 
     it 'should create a new bucket with bucket name' do
-      expect(s3_store).to receive(:create_bucket).with(bucket_name)
+      expect(aws_s3_client).to receive(:create_bucket).with({bucket: bucket_name}).and_return(response)
+      expect(STDOUT).to receive(:puts).once
       s3_store.create_bucket(bucket_name)
     end
 
