@@ -1,4 +1,3 @@
-require 'byebug'
 RSpec.describe Store do
   let (:s3) { Aws::S3::Client.new(stub_responses: true) }
   let (:s3_store) { Store.new }
@@ -44,7 +43,7 @@ RSpec.describe Store do
     end
 
     it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do
-      s3_store.stub(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      allow(s3_store).to receive(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
       expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
     end
   end
