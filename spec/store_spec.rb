@@ -16,7 +16,7 @@ RSpec.describe Store do
       s3_store.list_buckets
     end
     
-    it 'display message when there are no buckets - empty / nil response' do
+    it 'raise S3StoreEmptyError when there are no buckets - empty / nil response' do
       aws_s3_client.stub_responses(:list_buckets, buckets: [])
       expect { s3_store.list_buckets }.to raise_error(S3StoreEmptyError)
     end
@@ -38,7 +38,7 @@ RSpec.describe Store do
       s3_store.create_bucket(bucket_name)
     end
 
-    it 'should rescue Aws::S3::Errors::InvalidBucketName' do
+    it 'should raise Aws::S3::Errors::InvalidBucketName' do
       expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error(S3StoreArgumentError)
     end
 
