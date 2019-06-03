@@ -40,7 +40,7 @@ RSpec.describe AwsLoader do
       allow(File).to receive(:exists?).with(aws_file).and_return(false)
       expect(File).to receive(:open).with(aws_file, 'w').and_yield(file)
       expect(file).to receive(:puts)
-      expect(STDOUT).to receive(:puts).exactly(3).times
+      expect(STDOUT).to receive(:puts).thrice
       expect { test_module.yml_file_check }.to raise_error(SystemExit)
     end
   end

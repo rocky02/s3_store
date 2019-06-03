@@ -11,7 +11,8 @@ RSpec.describe Store do
     it 'should list all the buckets in the linked account when response is not empty/nil' do
       aws_s3_client.stub_responses(:list_buckets, buckets: [{ name: 'bucket1' }, { name: 'bucket2' }, { name: 'bucket3' }])
       response = aws_s3_client.list_buckets
-      expect(s3_store).to receive(:list_buckets).and_return(response)
+      expect(response.buckets.count).to eq(3)
+      expect(STDOUT).to receive(:puts).thrice
       s3_store.list_buckets
     end
     
