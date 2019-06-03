@@ -1,16 +1,16 @@
 RSpec.describe Bucket do
   let (:bucket_name) { 'test-123' }
-  let (:s3) { Aws::S3::Client.new(stub_responses: true) }
+  let (:aws_s3_client) { Aws::S3::Client.new(stub_responses: true) }
   let (:bucket) { Bucket.new(bucket_name) }
 
   before do
-    allow(bucket).to receive(:client).and_return(s3)
+    allow(bucket).to receive(:client).and_return(aws_s3_client)
   end
 
   context '#delete_bucket' do
     
     it 'should delete the bucket from the s3 store' do
-      expect(bucket).to receive(:delete_bucket)
+      expect(aws_s3_client).to receive(:delete_bucket).with({bucket: bucket_name})
       expect { bucket.delete_bucket }.to_not raise_error('Aws::S3::Errors::NoSuchBucket')
     end
 
