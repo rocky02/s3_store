@@ -12,8 +12,6 @@ class Store
     begin
       response = aws_client.create_bucket({bucket: bucket_name})
       puts "S3 Bucket #{bucket_name} created successfully!".colorize(:green) unless response.nil?
-    rescue Aws::S3::Errors::InvalidBucketName => e
-      puts "Bucket name #{bucket_name} is invalid".colorize(:red)
     rescue Aws::S3::Errors::BucketAlreadyOwnedByYou => e
       puts "Bucket with name #{bucket_name} already exists in your S3 account.".colorize(:yellow)
     end

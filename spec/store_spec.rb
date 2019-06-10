@@ -38,13 +38,10 @@ RSpec.describe Store do
       s3_store.create_bucket(bucket_name)
     end
 
-    it 'should raise Aws::S3::Errors::InvalidBucketName' do
-      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error(S3StoreArgumentError)
-    end
-
     it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do
-      allow(s3_store).to receive(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
-      expect { s3_store.create_bucket(invalid_bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      allow(aws_s3_client).to receive(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      expect { s3_store.create_bucket(bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      # expect(STDOUT).to receive(:puts).once
     end
   end
 
