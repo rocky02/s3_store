@@ -39,8 +39,8 @@ RSpec.describe Store do
     end
 
     it 'should rescue Aws::S3::Errors::BucketAlreadyOwnedByYou' do
-      allow(aws_s3_client).to receive(:create_bucket).and_raise('Aws::S3::Errors::BucketAlreadyOwnedByYou')
-      expect { s3_store.create_bucket(bucket_name) }.to raise_error('Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      aws_s3_client.stub_responses(:create_bucket, 'Aws::S3::Errors::BucketAlreadyOwnedByYou')
+      expect { s3_store.create_bucket(bucket_name) }.to raise_error(Exception)
       # expect(STDOUT).to receive(:puts).once
     end
   end
