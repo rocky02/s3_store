@@ -1,37 +1,36 @@
 require 'yaml'
-require_relative '../config/s3_store'
 module AwsLoader
-  
-  AWS_PATH = File.join(QIt.root, 'config/aws.yml')
-  AWS = YAML.load(File.read(AWS_PATH))["aws"] if File.exists?(AWS_PATH)
-  def generate_aws_yml_file
-    sample_aws = {"aws"=>{"access_key_id"=>"", "secret_access_key"=>"", "region"=>""}}
-    File.open(AWS_PATH, 'w') do |file|
-      file.puts sample_aws.to_yaml
+
+  AWS = YAML.load(File.read(Application.aws_config_file_path))['aws'] if File.exists?(Application.aws_config_file_path)
+
+  def config_folder_check
+    path = Application.root + '/config'
+    unless File.directory?(path)
+      FileUtils.mkdir_p(path)[0]
+    end
+  end
+
+  def yml_file_check
+    if File.exists?(Application.aws_config_file_path)
+      file_content = YAML.load(File.read(Application.aws_config_file_path))
+      if !file_content || file_content.values.any?(&:empty?)
+        puts 'Fill in the appropriate values for the aws.yml file'.colorize(:light_red)
+        exit(1)
+      end
+    else
+      puts 'Missing aws.yml file!'.colorize(:yellow)
+      sample_aws = {"aws"=>{"access_key_id"=>"", "secret_access_key"=>"", "region"=>""}}
+      File.open(Application.aws_config_file_path, 'w') do |file|
+        file.puts sample_aws.to_yaml
+      end
+      puts 'aws.yml file created...'.colorize(:yellow)
+      puts "Fill in the appropriate values for the aws.yml file.".colorize(:red)
+      exit(1) 
     end
   end
 
   def configure_aws_file
-    begin
-      if File.exists?(AWS_PATH)
-        aws = YAML.load(File.read(AWS_PATH))["aws"]
-        if aws.values.any?(&:empty?)
-          puts "Fill in the appropriate values for the aws.yml file".colorize(:light_red)
-          exit 1
-        end 
-      else
-        puts "No `aws.yml` file present!".colorize(:red)
-        generate_aws_yml_file
-        puts "Created file and set the appropriate values!".colorize(:red)
-        exit 1
-      end
-    rescue => e
-      puts "Exception with aws.yml file #{e.inspect}".colorize(:light_red)
-    end
+    config_folder_check
+    yml_file_check
   end
-end
-
-# Dummy class for RSpec testing purposes
-class ModuleTest
-  include AwsLoader
 end
