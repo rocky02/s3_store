@@ -22,6 +22,11 @@ class App
     when 'list'
       store = Store.new
       store.list_buckets
+    when 'copy'
+      raise S3StoreArgumentError, "S3StoreArgumentError:: insufficient arguments" if options.count != 4
+
+      s3_obj = S3Object.new(bucket_name)
+      s3_obj.perform_operation(options = { operation: 'copy', source: options[1], destination: options[2], key: options[3] })
     else
       raise S3StoreNoServiceError, "Invalid operation name. Try #{OPERATIONS.join(', ')}.".colorize(:red) if (operation.nil? || !OPERATIONS.include?(operation.downcase))
     end  
@@ -30,6 +35,7 @@ end
 
 # Beginning of execution of App.
 options = ARGV
+puts options
 raise S3StoreArgumentError, "Wrong Arguments. Check documentation on how to run the operation.".colorize(:red) if options.length < 1
 operation = options[0]
 

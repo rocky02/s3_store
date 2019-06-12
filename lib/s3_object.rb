@@ -45,10 +45,28 @@ class S3Object
     end
   end
 
+  def perform_operation(params={})
+    options = sanitize_params(params)
+    if options[:source].match?(FILEPATH_REGEX) && !options[:destination].match?(FILEPATH_REGEX)
+      upload(options[:source], options[:key])
+    elsif options[:destination].match?(FILEPATH_REGEX) && !options[:source].match?(FILEPATH_REGEX)
+      download(options[:key], options[:destination])
+    else
+      copy(options[:destination], options[:key])
+    end
+  end
+
   protected
   
   def handle_error(error)
     Application.log(error)
     puts "Error :: #{error}".colorize(:red)
+  end
+
+  def sanitize_params(options={})
+    key = options[:key].split(':')[1]
+    source = options[:source].split(':')[1]
+    destination = options[:destination].split(':')[1]
+    { key: key, source: source, destination: destination }
   end
 end
