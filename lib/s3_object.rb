@@ -3,7 +3,7 @@ class S3Object
   attr_accessor :bucket
   attr_reader :aws_obj
 
-  FILEPATH_REGEX = /(\\\\?([^\\/]*[\\/])*)([^\\/]+)$/
+  FILEPATH_REGEX = "(\\\\?([^\\/]*[\\/])*)([^\\/]+)$"
 
   def initialize(bucket)
     @aws_obj = Application.new
