@@ -1,6 +1,6 @@
 
 # Note: Deriving S3StoreStandardError Class from Ruby's StandardError Class 
-# and further deriving S3Store Errors from S3StoreStandardError.
+# and further deriving all other application errors from S3StoreStandardError.
 
 class S3StoreStandardError < StandardError; end
 
@@ -17,3 +17,5 @@ class S3StoreEmptyBucketError < S3StoreStandardError; end
 class S3StoreEmptyError < S3StoreStandardError; end
 
 class S3ObjectCopyError < S3ObjectStandardError; end
+
+class S3ObjectOperationError < S3ObjectStandardError; end

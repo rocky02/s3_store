@@ -1,6 +1,6 @@
 class Application
 
-  attr_reader :client
+  attr_reader :client, :resource
   
   def initialize
     creds = Aws::Credentials.new(AwsLoader::AWS["access_key_id"], AwsLoader::AWS["secret_access_key"])
