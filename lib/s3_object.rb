@@ -64,23 +64,6 @@ class S3Object
     end
   end
 
-  protected
-  
-  def handle_error(error)
-    Application.log.error(error)
-    puts "Error :: #{error}".colorize(:red)
-  end
-
-  def sanitize_params(options={})
-    key, source, destination = "", "", ""
-    options[:params].each do |param|
-      key = param.split(':')[1] if param.match?(/key/)
-      source = param.split(':')[1] if param.match?(/source/)
-      destination = param.split(':')[1] if param.match?(/destination/)
-    end
-    { key: key, source: source, destination: destination }
-  end
-
   def invalid_file_options?(source, destination)
     !(source.match?(FILEPATH_REGEX) && destination.match?(FILEPATH_REGEX))
   end
@@ -98,7 +81,24 @@ class S3Object
   end
 
   def object_exists?(object)
-    bucket = aws_obj.resource.bucket(self.bucket)
+    bucket = aws_obj.resource.bucket(bucket)
     bucket.object(object).exists?
+  end
+
+  protected
+  
+  def handle_error(error)
+    Application.log.error(error)
+    puts "Error :: #{error}".colorize(:red)
+  end
+
+  def sanitize_params(options={})
+    key, source, destination = "", "", ""
+    options[:params].each do |param|
+      key = param.split(':')[1] if param.match?(/key/)
+      source = param.split(':')[1] if param.match?(/source/)
+      destination = param.split(':')[1] if param.match?(/destination/)
+    end
+    { key: key, source: source, destination: destination }
   end
 end
