@@ -11,57 +11,45 @@ class S3Object
   end
 
   def copy(destination_bucket,filename)
-    begin
-      result = aws_obj.client.copy_object(bucket: destination_bucket, copy_source: "#{bucket}/#{filename}", key: filename)
-      if result
-        Application.log.info "Object copied from #{bucket} to #{destination_bucket} - #{result}"
-        puts "#{filename} copied successfully to #{destination_bucket}!".colorize(:green)
-      end
-    rescue Aws::S3::Errors::PermanentRedirect => e
-      handle_error(e)
-    end
+    aws_obj.client.copy_object(bucket: destination_bucket, copy_source: "#{bucket}/#{filename}", key: filename)
   end
 
   def upload(filepath, key=nil)
+    key = File.basename(filepath) if key.nil? || key.empty?
+    obj = aws_obj.resource.bucket(bucket).object(key)
+    response = obj.upload_file(filepath)
+    raise S3ObjectCopyError, "S3ObjectCopyError :: Unable to upload #{filepath}.".colorize(:red) unless response
+    response
+  end
+
+  def download(key, destination_path)
+    aws_obj.client.get_object({ bucket: bucket, key:key }, target: destination_path)
+  end
+
+  def perform_operation(params={})
+    options = sanitized_params(params)
+
+    raise S3ObjectOperationError, "S3ObjectOperationError :: Source or Destination or both files must belong to a S3 bucket." if invalid_file_options?(options[:source], options[:destination])
+
     begin
-      key = File.basename(filepath) if key.nil? || key.empty?
-      obj = aws_obj.resource.bucket(bucket).object(key)
-      if obj.upload_file(filepath)
-        Application.log.info "#{key} upload successful! :: #{obj}"
-        puts "File upload to #{bucket} successful!".colorize(:green)
-      else 
-        raise S3ObjectCopyError, "S3ObjectCopyError :: Unable to upload #{filepath}.".colorize(:red)
+      result = if file_is_local?(options[:source]) && !file_is_local?(options[:destination])
+                upload(options[:source], options[:key])
+              elsif file_is_local?(options[:destination]) && object_exists?(options[:source])
+                download(options[:key], options[:destination])
+              else
+                copy(options[:destination], options[:key])
+              end
+      
+      if result
+        Application.log.info "Copy from #{options[:source]} to #{options[:destination]} completed successfully."
+        puts "Copy from #{options[:source]} to #{options[:destination]} completed successfully.".colorize(:green)
       end
+    
     rescue Aws::S3::Errors::NoSuchBucket => e
       handle_error(e)
     rescue Aws::S3::Errors::PermanentRedirect => e
       handle_error(e)
-    end
-  end
-
-  def download(key, destination_path)
-    begin
-      result = aws_obj.client.get_object({ bucket: bucket, key:key }, target: destination_path)
-      if result
-        Application.log.info "#{key} copied to #{destination_path} successfully."
-        puts "#{key} copied to #{destination_path} successfully."
-      end
-    rescue Aws::S3::Errors::PermanentRedirect => e
-      handle_error(e)
-    end
-  end
-
-  def perform_operation(params={})
-    options = sanitize_params(params)
-
-    raise S3ObjectOperationError, "S3ObjectOperationError :: Source or Destination or both files must belong to a S3 bucket." if invalid_file_options?(options[:source], options[:destination])
-    if file_is_local?(options[:source]) && object_from_bucket?(options[:destination])
-      upload(options[:source], options[:key])
-    elsif file_is_local?(options[:destination]) && object_exists?(options[:source])
-      download(options[:key], options[:destination])
-    else
-      copy(options[:destination], options[:key])
-    end
+    end        
   end
 
   def invalid_file_options?(source, destination)
@@ -69,7 +57,7 @@ class S3Object
   end
 
   def file_is_local?(file)
-    file.match?(FILEPATH_REGEX) && !valid_bucket_name?(file)
+    file.match?(FILEPATH_REGEX) && !valid_bucket_name?(file) && !object_exists?(file)
   end
 
   def object_from_bucket?(file)
@@ -80,7 +68,7 @@ class S3Object
     Bucket.valid?(bucket)
   end
 
-  def object_exists?(object)
+  def object_exists?(object, bucket = self.bucket)
     bucket = aws_obj.resource.bucket(bucket)
     bucket.object(object).exists?
   end
@@ -92,7 +80,7 @@ class S3Object
     puts "Error :: #{error}".colorize(:red)
   end
 
-  def sanitize_params(options={})
+  def sanitized_params(options={})
     key, source, destination = "", "", ""
     options[:params].each do |param|
       key = param.split(':')[1] if param.match?(/key/)
