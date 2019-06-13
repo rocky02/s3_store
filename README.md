@@ -11,6 +11,8 @@ The basic command line execution statement to access any s3 operation begins wit
 bin/s3_store_server <operation-name> <list-of-required-params-for-operation>
 ```
 
+### Usage:
+
 * #### Bucket Operations
 
 1. **List Buckets** - This will list out all the buckets in your aws s3 account. 
