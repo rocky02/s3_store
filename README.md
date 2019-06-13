@@ -37,6 +37,7 @@ bin/s3_store_server delete <bucket-name>
 * #### Object Operations
 
 1. Copy Object
+
 Copy operation deals with being able to copy files and s3 objects. 
 This feature handles 4 scenarios - 
 
