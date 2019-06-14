@@ -4,6 +4,6 @@ if ARGV[1].nil?
   system("ruby", "bin/app.rb", ARGV[0])
 elsif ARGV[2].nil?
   system("ruby", "bin/app.rb", ARGV[0], ARGV[1])
-elsif ARGV.count == 5
-  system("ruby", "bin/app.rb", ARGV[0], ARGV[1], ARGV[2], ARGV[3], ARGV[4])
+else
+  system("ruby", "bin/app.rb", ARGV[0], ARGV[1], ARGV[2])
 end

@@ -2,7 +2,8 @@ require_relative '../boot'
 class App
   include AwsLoader
 
-  OPERATIONS = ['create', 'delete', 'list']
+  OPERATIONS = ['create', 'delete', 'list', 'copy']
+  BUCKET_URI_REGEX = /^(s3:\/\/)/
 
   def execute_operation(options)
     operation = options.delete_at(0)
@@ -24,15 +25,45 @@ class App
       buckets = store.list_buckets
       buckets.each { |name| puts name.colorize(:yellow) }
     when 'copy'
-      raise S3StoreArgumentError, "S3StoreArgumentError:: insufficient arguments" if options.count != 4
+      raise S3StoreArgumentError, "S3StoreArgumentError:: insufficient arguments" if options.count != 2
 
+      copy_params = extract_params(options)
+      bucket_name = copy_params[:bucket]
       s3_obj = S3Object.new(bucket_name)
-      s3_obj.perform_operation(options = { operation: 'copy', params: [options[1], options[2], options[3]] })
+      s3_obj.perform_operation(copy_params)
     else
       raise S3StoreNoServiceError, "Invalid operation name. Try #{OPERATIONS.join(', ')}.".colorize(:red) if (operation.nil? || !OPERATIONS.include?(operation.downcase))
     end  
   end
+
+  def extract_params(options)
+    source, destination, bucket = nil, nil, nil
+
+    source_file = File.basename(options[0])
+
+    if options[0].match?(BUCKET_URI_REGEX) && options[1].match?(BUCKET_URI_REGEX) # copy bucket-to-bucket
+      source = extract_s3_bucket(options[0])
+      destination = extract_s3_bucket(options[1])
+      bucket = source
+    elsif !options[0].match?(BUCKET_URI_REGEX) # upload from local-to-bucket
+      source = options[0]
+      destination = extract_s3_bucket(options[1])
+      bucket = destination
+    else # download from bucket-to-local
+      source = extract_s3_bucket(options[0])
+      destination = options[1]
+      bucket = source
+    end    
+    
+    { source: source, destination: destination, key: source_file, bucket: bucket }
+  end
+  
+  def extract_s3_bucket(filepath)
+    bucket = filepath.gsub(BUCKET_URI_REGEX, '')
+    bucket.split('/')[0]
+  end
 end
+
 
 # Beginning of execution of App.
 options = ARGV
