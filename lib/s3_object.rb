@@ -53,11 +53,7 @@ class S3Object
   end
 
   def file_is_local?(file)
-    !valid_bucket_name?(file) 
-  end
-
-  def valid_bucket_name?(bucket)
-    Bucket.valid?(bucket)
+    !Bucket.valid?(file)
   end
 
   def object_exists?(object, bucket = self.bucket)
