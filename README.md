@@ -56,14 +56,14 @@ Each scenario works as explained below -
 
 Command Line example - 
 ```
-bin/s3_store_server copy bucket-1 key:"file_2" source:"file_1" destination:"bucket-2"                         
+bin/s3_store_server copy <source-bucket> key:<key-name> source:<source-file-name> destination:<destination-bucket>                         
 ```
 
 2. **Copy from local to s3 bucket - upload** - While copying objects from local to s3 bucket, s3_store uses the `upload_file` method. It requires the _source file path, destination bucket name_ and _key_.
 
 Command Line example - 
 ```
-bin/s3_store_server copy bucket-1 key:<key_name> source:<full_path_to_local_file> destination:bucket-1
+bin/s3_store_server copy <destination-bucket> key:<key-name> source:<full-path-to-local-file> destination:<destination-bucket>
 ```
 
 4. **Copy from local to local - not supported** - While copying objects from local to local, s3_store will raise an error `S3ObjectOperationError`. 
