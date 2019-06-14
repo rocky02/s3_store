@@ -52,18 +52,25 @@ All methods used are provided by the aws-sdk-s3 gem for v3.
 
 Each scenario works as explained below - 
 
-1. **Copy from one s3 bucket to another s3 bucket** - While copying objects from one bucket to another, s3_store uses the `copy_object` method. It requires the _source bucket name, destination bucket name_ and _key._
+1. **Copy from one s3 bucket to another s3 bucket** - While copying objects from one bucket to another, s3_store uses the `copy_object` method. It requires the _source-s3-object-uri, destination-bucket-uri_.
 
 Command Line example - 
 ```
-bin/s3_store_server copy <source-bucket> key:<key-name> source:<source-file-name> destination:<destination-bucket>                         
+bin/s3_store_server copy s3://<uri-path-to-object> s3://<destination-bucket>
 ```
 
-2. **Copy from local to s3 bucket - upload** - While copying objects from local to s3 bucket, s3_store uses the `upload_file` method. It requires the _source file path, destination bucket name_ and _key_.
+2. **Copy from local to s3 bucket - upload** - While copying objects from local to s3 bucket, s3_store uses the `upload_file` method. It requires the _source-file-path, destination-bucket-uri_.
 
 Command Line example - 
 ```
-bin/s3_store_server copy <destination-bucket> key:<key-name> source:<full-path-to-local-file> destination:<destination-bucket>
+bin/s3_store_server copy local-file-path s3://<destination-bucket>
+```
+
+3. **Copy from s3 bucket to local- download** - While copying objects from s3 bucket to local, s3_store uses the `get_object` method. It requires the _s3-object-uri _destination-file-path_.
+
+Command Line example - 
+```
+bin/s3_store_server copy s3://<source-obj-uri> local-file-path/<filename>
 ```
 
 4. **Copy from local to local - not supported** - While copying objects from local to local, s3_store will raise an error `S3ObjectOperationError`. 
