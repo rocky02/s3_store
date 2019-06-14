@@ -56,10 +56,6 @@ class S3Object
     !valid_bucket_name?(file) 
   end
 
-  def object_from_bucket?(file)
-    !file.match?(FILEPATH_REGEX) && valid_bucket_name?(file)
-  end
-
   def valid_bucket_name?(bucket)
     Bucket.valid?(bucket)
   end
@@ -74,15 +70,5 @@ class S3Object
   def handle_error(error)
     Application.log.error(error)
     puts "Error :: #{error}".colorize(:red)
-  end
-
-  def sanitized_params(options={})
-    key, source, destination = "", "", ""
-    options[:params].each do |param|
-      key = param.split(':')[1] if param.match?(/key/)
-      source = param.split(':')[1] if param.match?(/source/)
-      destination = param.split(':')[1] if param.match?(/destination/)
-    end
-    { key: key, source: source, destination: destination }
   end
 end
