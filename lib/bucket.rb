@@ -1,6 +1,8 @@
 class Bucket
 
   attr_reader :bucket_name, :client
+
+  BUCKET_NAME_REGEX = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/
   
   def initialize(name)
     @client = Application.new.client
@@ -8,8 +10,7 @@ class Bucket
   end
 
   def self.valid?(bucket_name)
-    regex = /(?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)/
-    bucket_name.match?(regex)    
+    bucket_name.match?(BUCKET_NAME_REGEX)    
   end
 
   def delete_bucket
@@ -19,6 +20,8 @@ class Bucket
       puts "Bucket #{bucket_name} deleted successfully!".colorize(:green) unless response.nil?
     rescue Aws::S3::Errors::NoSuchBucket => e
       puts "Aws::S3::Errors::NoSuchBucket :: #{bucket_name} does not exist!".colorize(:red)
+    rescue Aws::S3::Errors::BucketNotEmpty => e
+      puts "Aws::S3::Errors::BucketNotEmpty :: #{bucket_name} is not empty!".colorize(:red)
     end
   end
 end

@@ -3,7 +3,7 @@ class App
   include AwsLoader
 
   OPERATIONS = ['create', 'delete', 'list', 'copy']
-  BUCKET_URI_REGEX = /^(s3:\/\/)/
+  BUCKET_URI_REGEX = '^s3://([^/]+)/?(.*?([^/]+)/?)?$'
 
   def execute_operation(options)
     operation = options.delete_at(0)
@@ -37,36 +37,44 @@ class App
   end
 
   def extract_params(options)
-    source, destination, bucket = nil, nil, nil
+    source, destination, bucket, operation = nil, nil, nil, nil
 
     source_file = File.basename(options[0])
-
-    if options[0].match?(BUCKET_URI_REGEX) && options[1].match?(BUCKET_URI_REGEX) # copy bucket-to-bucket
+    if is_s3_uri?(options[0]) && is_s3_uri?(options[1]) # copy bucket-to-bucket
       source = extract_s3_bucket(options[0])
       destination = extract_s3_bucket(options[1])
       bucket = source
-    elsif !options[0].match?(BUCKET_URI_REGEX) # upload from local-to-bucket
+      operation = 'copy'
+    elsif is_s3_uri?(options[1]) && !is_s3_uri?(options[0]) # upload from local-to-bucket
       source = options[0]
       destination = extract_s3_bucket(options[1])
       bucket = destination
-    else # download from bucket-to-local
+      operation = 'upload'
+    elsif is_s3_uri?(options[0]) # download from bucket-to-local
       source = extract_s3_bucket(options[0])
       destination = options[1]
       bucket = source
+      operation = 'download'
+    else
+      Application.log.error "S3ObjectOperationError :: Copy failed! Invalid source and destination buckets."
+      raise S3ObjectOperationError, "Copy failed! Invalid source and destination."
     end    
     
-    { source: source, destination: destination, key: source_file, bucket: bucket }
+    { source: source, destination: destination, key: source_file, bucket: bucket, operation: operation }
+  end
+
+  def is_s3_uri?(uri)
+    uri.match?(BUCKET_URI_REGEX)
   end
   
   def extract_s3_bucket(filepath)
-    bucket = filepath.gsub(BUCKET_URI_REGEX, '')
-    bucket.split('/')[0]
+    filepath.match(BUCKET_URI_REGEX).captures[0]
   end
 end
 
 
 # Beginning of execution of App.
-options = ARGV
+options = ARGV[0].split(' ')
 puts options
 raise S3StoreArgumentError, "Wrong Arguments. Check documentation on how to run the operation.".colorize(:red) if options.length < 1
 operation = options[0]

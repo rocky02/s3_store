@@ -2,8 +2,6 @@ class S3Object
 
   attr_reader :aws_obj, :bucket
 
-  FILEPATH_REGEX = "(\\\\?([^\\/]*[\\/])*)([^\\/]+)$"
-
   def initialize(bucket)
     @aws_obj = Application.new
     @bucket = bucket
@@ -25,16 +23,16 @@ class S3Object
   end
 
   def perform_operation(options)
-    raise S3ObjectOperationError, "S3ObjectOperationError :: Source or Destination or both files must belong to a S3 bucket." if local_to_local?(options[:source], options[:destination])
-
     begin
-      result = if file_is_local?(options[:source]) && !file_is_local?(options[:destination])
-                upload(options[:source], options[:key])
-              elsif file_is_local?(options[:destination]) && object_exists?(options[:key])
-                download(options[:key], options[:destination])
-              else
-                copy(options[:destination], options[:key])
-              end
+      result = nil
+      case options[:operation]
+      when 'copy'
+        result = copy(options[:destination], options[:key])
+      when 'upload'
+        result = upload(options[:source], options[:key])
+      when 'download'
+        result = download(options[:key], options[:destination])
+      end
       
       if result
         Application.log.info "Copy from #{options[:source]} to #{options[:destination]} completed successfully."
@@ -45,15 +43,17 @@ class S3Object
       handle_error(e)
     rescue Aws::S3::Errors::PermanentRedirect => e
       handle_error(e)
+    rescue Aws::S3::Errors::InvalidRequest => e
+      handle_error(e)
     end        
   end
 
   def local_to_local?(source, destination)
-    file_is_local?(source) && file_is_local?(destination)
+    !is_s3_bucket?(source) && !is_s3_bucket?(destination)
   end
 
-  def file_is_local?(file)
-    !Bucket.valid?(file)
+  def is_s3_bucket?(file)
+    file.match?(App::BUCKET_URI_REGEX)
   end
 
   def object_exists?(object, bucket = self.bucket)
