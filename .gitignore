@@ -4,3 +4,4 @@
 # Ignore Folders
 config/aws.*
 coverage/**
+log/**
