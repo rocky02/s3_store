@@ -1,7 +1,3 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-if ARGV[1].nil?
-  system("ruby", "bin/app.rb", ARGV[0])
-else
-  system("ruby", "bin/app.rb", ARGV[0], ARGV[1])
-end
+system("ruby", "bin/app.rb", ARGV.join(' '))

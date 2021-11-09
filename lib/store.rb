@@ -23,7 +23,7 @@ class Store
           "S3StoreEmptyError :: You don't seem to have any buckets in your linked AWS S3 account. You may create one by using the command :: ".colorize(:light_blue) + " bin/s3_store_server create <bucket-name>".colorize(:yellow).bold if no_buckets?(response)
 
       bucket_names = response.buckets.map(&:name)
-      bucket_names.each { |name| puts name.colorize(:yellow) }
+      bucket_names
   end
 
   def no_buckets?(response)

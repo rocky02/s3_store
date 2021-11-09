@@ -1,10 +1,11 @@
 class Application
 
-  attr_reader :client
+  attr_reader :client, :resource
   
   def initialize
     creds = Aws::Credentials.new(AwsLoader::AWS["access_key_id"], AwsLoader::AWS["secret_access_key"])
     @client = Aws::S3::Client.new(region: AwsLoader::AWS["region"], credentials: creds)
+    @resource = Aws::S3::Resource.new(region: AwsLoader::AWS["region"], credentials: creds)
   end
 
   @@root ||= Dir.pwd
@@ -15,7 +16,7 @@ class Application
     end
   
     def log
-        @@logger ||= Logger.new(File.join(@@root, 'log', 'q_it.log'))
+        @@logger ||= Logger.new(File.join(@@root, 'log', 's3_store.log'))
       end
 
       def generate_log_file
